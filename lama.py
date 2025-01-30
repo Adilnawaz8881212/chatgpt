@@ -4,6 +4,8 @@ from groq import Groq
 from PIL import Image
 import io
 import time
+from io import BytesIO
+from PIL import ImageGrab
 
 # Initialize the Groq client and session state
 if 'client' not in st.session_state:
@@ -103,7 +105,7 @@ with st.container():
     with col2:
         image_input_option = st.radio(
             "Image input:",
-            ("None", "Upload", "URL"),
+            ("None", "Upload", "URL", "Paste"),
             horizontal=True
         )
         
@@ -122,6 +124,19 @@ with st.container():
                     st.image(image_url, use_container_width=True)
                 except Exception as e:
                     st.error("Invalid image URL")
+        
+        elif image_input_option == "Paste":
+            st.write("Press Ctrl+V to paste an image")
+            if st.button("Paste Image"):
+                try:
+                    image = ImageGrab.grabclipboard()
+                    if image:
+                        st.session_state.current_image = image
+                        st.image(image, use_container_width=True)
+                    else:
+                        st.error("No image found in clipboard")
+                except Exception as e:
+                    st.error(f"Error pasting image: {e}")
 
     with col1:
         # Chat input
